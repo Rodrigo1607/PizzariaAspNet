@@ -11,21 +11,21 @@ namespace Pizzaria1000Video.Servicos.Pizza
         private readonly AppDbContext _context;
         private readonly string _sistema;
 
-                                                        //ter acesso ao wwwroot
+        //ter acesso ao wwwroot
         public PizzaService(AppDbContext context, IWebHostEnvironment sistema)
         {
             _context = context;
             _sistema = sistema.WebRootPath;
         }
 
-       
+
 
         public string GeraCaminhoArquivo(IFormFile foto)
         {                       //Guid retorna uma junção decaracteres únicos
             var codigounico = Guid.NewGuid().ToString();
             //nomear aquivo                             s/espaço - Minúsculo                 extensão.                                 
             var nomeCaminhoImagem = foto.FileName.Replace(" ", "").ToLower() + codigounico + ".png";
-                                                       //criar o caminho onde vai salvar
+            //criar o caminho onde vai salvar
             var caminhoParaSalvarImagem = _sistema + "\\imagem\\";
 
             if (!Directory.Exists(caminhoParaSalvarImagem))
@@ -33,7 +33,7 @@ namespace Pizzaria1000Video.Servicos.Pizza
                 Directory.CreateDirectory(caminhoParaSalvarImagem);
 
             }
-                using (var stream = File.Create(caminhoParaSalvarImagem + nomeCaminhoImagem))
+            using (var stream = File.Create(caminhoParaSalvarImagem + nomeCaminhoImagem))
             {
                 foto.CopyToAsync(stream).Wait();
             }
@@ -67,9 +67,59 @@ namespace Pizzaria1000Video.Servicos.Pizza
             return await _context.Pizzas.ToListAsync();
         }
 
-        public Task<PizzaModel> GetPizzasPorId(int id)
+        public async Task<PizzaModel> GetPizzasPorId(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Pizzas.FirstOrDefaultAsync(pizza => pizza.Id == id);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<PizzaModel> EditarPizza(PizzaModel pizza, IFormFile? foto)
+        {
+            try
+            {
+                var pizzaBanco = await _context.Pizzas.AsNoTracking().FirstOrDefaultAsync(pizzaBD => pizzaBD.Id == pizza.Id);
+                var nomeCaminhoImagem = "";
+
+                if (foto != null)
+                {
+                    string caminhoCapaExistente = _sistema + "\\imagem\\" + pizzaBanco.Capa;
+                    if (File.Exists(caminhoCapaExistente))
+                    {
+                        File.Delete(caminhoCapaExistente);
+                    }
+
+                    nomeCaminhoImagem = GeraCaminhoArquivo(foto);
+                }
+                pizzaBanco.Sabor = pizza.Sabor;
+                pizzaBanco.Descricao=pizza.Descricao;
+                pizzaBanco.Valor = pizza.Valor;
+
+                if (nomeCaminhoImagem != "")
+                {
+                    pizzaBanco.Capa = nomeCaminhoImagem;
+                }
+                else
+                {
+                    pizzaBanco.Capa = pizza.Capa;
+                }
+
+
+                _context.Update(pizzaBanco);
+               await _context.SaveChangesAsync();
+
+                return pizza;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pizzaria1000Video.DTO;
+using Pizzaria1000Video.Models;
 using Pizzaria1000Video.Servicos.Pizza;
 
 namespace Pizzaria1000Video.Controllers
@@ -21,6 +22,7 @@ namespace Pizzaria1000Video.Controllers
         {
             return View();
         }
+        
 
         [HttpPost]
         public async Task<IActionResult> Cadastrar(PizzaCriacaoDTO pizzaCriacaoDTO, IFormFile foto)
@@ -36,6 +38,25 @@ namespace Pizzaria1000Video.Controllers
             }
         }
 
+        public async Task<IActionResult> Editar(int id)
+        {
+            var pizza = await _pizzaService.GetPizzasPorId(id);
+            return View(pizza);       
+        }
 
+
+        [HttpPost]
+        public async Task<IActionResult>Editar(PizzaModel pizzaModel, IFormFile? foto)
+        {
+            if(ModelState.IsValid)
+            {
+                var pizza = await _pizzaService.EditarPizza(pizzaModel, foto);
+                return RedirectToAction("Index", "Pizza");
+            }
+            else
+            {
+                return View(pizzaModel);
+            }
+        }
     }
 }
