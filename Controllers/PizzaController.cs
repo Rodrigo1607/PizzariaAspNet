@@ -14,7 +14,7 @@ namespace Pizzaria1000Video.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var pizzas = await _pizzaService.GetPizzas(); 
+            var pizzas = await _pizzaService.GetPizzas();
             return View(pizzas);
         }
 
@@ -22,7 +22,7 @@ namespace Pizzaria1000Video.Controllers
         {
             return View();
         }
-        
+
 
         [HttpPost]
         public async Task<IActionResult> Cadastrar(PizzaCriacaoDTO pizzaCriacaoDTO, IFormFile foto)
@@ -41,14 +41,19 @@ namespace Pizzaria1000Video.Controllers
         public async Task<IActionResult> Editar(int id)
         {
             var pizza = await _pizzaService.GetPizzasPorId(id);
-            return View(pizza);       
+            return View(pizza);
         }
 
+        public async Task<IActionResult> Detalhes(int id)
+        {
+            var pizza = await _pizzaService.GetPizzasPorId(id);
+            return View(pizza); 
+        }
 
         [HttpPost]
-        public async Task<IActionResult>Editar(PizzaModel pizzaModel, IFormFile? foto)
+        public async Task<IActionResult> Editar(PizzaModel pizzaModel, IFormFile? foto)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var pizza = await _pizzaService.EditarPizza(pizzaModel, foto);
                 return RedirectToAction("Index", "Pizza");
@@ -57,6 +62,14 @@ namespace Pizzaria1000Video.Controllers
             {
                 return View(pizzaModel);
             }
+        }
+
+        public async Task<IActionResult> Remover(int id)
+        {
+
+            var pizza = await _pizzaService.RemoverPizza(id);
+            return RedirectToAction("Index", "Pizza");
+
         }
     }
 }

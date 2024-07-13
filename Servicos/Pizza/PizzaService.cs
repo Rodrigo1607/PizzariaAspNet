@@ -98,7 +98,7 @@ namespace Pizzaria1000Video.Servicos.Pizza
                     nomeCaminhoImagem = GeraCaminhoArquivo(foto);
                 }
                 pizzaBanco.Sabor = pizza.Sabor;
-                pizzaBanco.Descricao=pizza.Descricao;
+                pizzaBanco.Descricao = pizza.Descricao;
                 pizzaBanco.Valor = pizza.Valor;
 
                 if (nomeCaminhoImagem != "")
@@ -112,8 +112,36 @@ namespace Pizzaria1000Video.Servicos.Pizza
 
 
                 _context.Update(pizzaBanco);
-               await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
+                return pizza;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<PizzaModel>RemoverPizza(int id)
+        {
+            try
+            {
+                var pizza = await _context.Pizzas.FirstOrDefaultAsync(pizzaBanco => pizzaBanco.Id == id);
+                 _context.Remove(pizza);
+                await _context.SaveChangesAsync();
+                return pizza;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<PizzaModel>> GetPizzasFiltro(string? pesquisar)
+        {
+            try
+            {
+                var pizza = await _context.Pizzas.Where(pizzaBanco => pizzaBanco.Sabor.Contains(pesquisar)).ToListAsync();
                 return pizza;
             }
             catch (Exception ex)

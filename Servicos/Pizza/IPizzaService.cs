@@ -9,6 +9,7 @@ namespace Pizzaria1000Video.Servicos.Pizza
         Task<List<PizzaModel>> GetPizzas();
         Task<PizzaModel> GetPizzasPorId(int id);
         Task<PizzaModel> EditarPizza(PizzaModel pizza, IFormFile? foto);
-
+        Task<PizzaModel> RemoverPizza(int id);
+        Task<List<PizzaModel>> GetPizzasFiltro(string? pesquisar);
     }
 }
