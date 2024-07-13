@@ -71,5 +71,17 @@ namespace Pizzaria1000Video.Controllers
             return RedirectToAction("Index", "Pizza");
 
         }
+
+        public async Task<IActionResult> BuscarSugestoes(string termo)
+        {
+            if (string.IsNullOrEmpty(termo) || termo.Length < 3)
+            {
+                return Json(new List<PizzaModel>());
+            }
+
+            var pizzas = await _pizzaService.GetPizzasFiltro(termo);
+            return Json(pizzas);
+        }
+
     }
 }
